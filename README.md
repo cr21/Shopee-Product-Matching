@@ -29,4 +29,6 @@ sample_submission.csv - a sample submission file in the correct format.
 
 ## Workflow
 ![workflow](/Shopee%20Images/Model_Shopee.jpeg)
+![workflow2](/Shopee%20Images/workflow_model.jpeg)
+
 
