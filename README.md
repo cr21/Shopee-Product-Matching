@@ -27,4 +27,6 @@ sample_submission.csv - a sample submission file in the correct format.
 - posting_id - the ID code for the posting.
 - matches - Space delimited list of all posting IDs that match this posting. Posts always self-match. Group sizes were capped at 50, so there's no need to predict more than 50 matches.
 
+## Workflow
+![workflow](/Shopee%20Images/Model_Shopee.jpeg)
 
