@@ -32,3 +32,22 @@ sample_submission.csv - a sample submission file in the correct format.
 ![workflow2](/Shopee%20Images/workflow_model.jpeg)
 
 
+
+## List Of Approaches I tried
+
+
+1. [Convolution AutoEncoder - BaseLine](/shopee-basic-autoencoder.ipynb)
+    ### Apparoach
+    AutoEncoder model consist of two parts, Encoder  and Decoder. Encoder downsamples the image to lower dimension dimension features, and decoder is used to reconstruct the same image using latent dimension. 
+    
+    My Hypothesis is that If I am able to regenerate the same image with with little error, then we can say that latent dimension is compressed and dense feature that captures the image information in lower dimension. 
+    
+    After training model, we will pass all images to encoder to generate the latent features, we will store latent features to database. At test time, we will pass image to encoder to get query features. we will then compute the euclidean distance to all the features in database to get top predction. 
+    
+    ### Result:
+    
+    AutoEncoder produce the decent result, but it is still not good approach to generate the semantically similar image.
+    
+    it is also error prone and give some useless result, in AutoEncoder we rely on MSE loss which will focus on reducing each pixel error distance, which is misleading in semantic similarity.
+    
+3. 
