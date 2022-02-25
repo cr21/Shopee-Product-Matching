@@ -2,6 +2,7 @@
 # Shopee-Product-Matching
 
 ![Shopee](/Shopee%20Images/Shopee_image1.jpeg)
+
 ## Business Problem
 
 Shopee is the leading e-commerce platform in Southeast Asia and Taiwan. Customers appreciate its easy, secure, and fast online shopping experience tailored to their region. The company also provides strong payment and logistical support along with a 'Lowest Price Guaranteed' feature on thousands of Shopee's listed products.
@@ -32,6 +33,9 @@ sample_submission.csv - a sample submission file in the correct format.
 ![workflow2](/Shopee%20Images/workflow_model.jpeg)
 
 
+## Overall Basic pipeline
+
+![CBIR](/Shopee%20Images/CBIR.jpeg) 
 
 ## List Of Approaches I tried
 
