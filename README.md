@@ -54,4 +54,21 @@ sample_submission.csv - a sample submission file in the correct format.
     
     it is also error prone and give some useless result, in AutoEncoder we rely on MSE loss which will focus on reducing each pixel error distance, which is misleading in semantic similarity.
     
-3. 
+2. [Label Group MultiClass classification using Weighted Random Sampler using multiclass Cross Entropy loss ](/shopee-label-group-classification-training.ipynb)
+
+    ### Solution Approach
+
+    * In this competition it is given that,if two or more images have **same label group** then they are **similar products.** 
+    * Basically we can use this information to transfer the business problem into **multi class classification** problem.
+    * From Image EDA, I found out that we have **11014** different classes, and dataset is **not balanced dataset**
+    * If you see below plot, we can clearly see that there are **hardly 1000 data points having more than 10 products per label.*
+    * In this notebook I used **Weighted Sampler technique used in pytorch for handling imbalanced classification problem**
+
+    ![Label_freq](/Shopee_Repo_Images/Label_frequency_plot.png)
+    
+    ### Results
+    
+    * Using **Weighted Sampler technique** really helped me to **improve classification accuracy** for **under represented label groups ( label groups for which only 2 product images** were available.
+    * I achivied **0.62 F1 Score** which is significant improvement from earlier baseline model.
+    
+
