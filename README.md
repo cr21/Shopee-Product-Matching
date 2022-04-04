@@ -40,7 +40,7 @@ sample_submission.csv - a sample submission file in the correct format.
 ## List Of Approaches I tried
 
 
-1. [Convolution AutoEncoder - BaseLine](/shopee-basic-autoencoder.ipynb)
+1. [Convolution AutoEncoder - BaseLine](/AutoEncoder%5BBaseline%5D.ipynb)
     ### Apparoach
     AutoEncoder model consist of two parts, Encoder  and Decoder. Encoder downsamples the image to lower dimension dimension features, and decoder is used to reconstruct the same image using latent dimension. 
     
@@ -54,7 +54,7 @@ sample_submission.csv - a sample submission file in the correct format.
     
     it is also error prone and give some useless result, in AutoEncoder we rely on MSE loss which will focus on reducing each pixel error distance, which is misleading in semantic similarity.
     
-2. [Label Group MultiClass classification using Weighted Random Sampler using multiclass Cross Entropy loss ](/shopee-label-group-classification-training.ipynb)
+2. [Label Group MultiClass classification using Weighted Random Sampler using multiclass Cross Entropy loss ](/PriceLabelClassification%5BTraining%5D.ipynb)
 
     ### Solution Approach
 
