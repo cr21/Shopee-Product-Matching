@@ -3,6 +3,7 @@
 
 ![Shopee](/Shopee%20Images/Shopee_image1.jpeg)
 
+
 ## Business Problem
 
 Shopee is the leading e-commerce platform in Southeast Asia and Taiwan. Customers appreciate its easy, secure, and fast online shopping experience tailored to their region. The company also provides strong payment and logistical support along with a 'Lowest Price Guaranteed' feature on thousands of Shopee's listed products.
@@ -29,7 +30,7 @@ sample_submission.csv - a sample submission file in the correct format.
 - matches - Space delimited list of all posting IDs that match this posting. Posts always self-match. Group sizes were capped at 50, so there's no need to predict more than 50 matches.
 
 ## Workflow
-![workflow](/Shopee%20Images/Model_Shopee.jpeg)
+<!-- ![workflow](/Shopee%20Images/Model_Shopee.jpeg) -->
 ![workflow2](/Shopee%20Images/workflow_model.jpeg)
 
 
@@ -52,6 +53,7 @@ We were given information that **all the similar product have same label group**
 
 we train a classification CNN by inputting product images and getting a one hot vector output that represents the label group of the image. For example, pretend we train a CNN to classify ten types of product items and input an image. Then the one-hot-vector output pictured below predicts product label group 4.
 
+![cnn_embeddings](/Shopee%20Images/cnn_embeddings.jpeg)
 
 ### Generating Embeddings 
 
