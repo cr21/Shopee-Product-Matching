@@ -75,14 +75,13 @@ And **cosine distance** would be **one minus the cosine of the angle from point 
 
 1. [Convolution AutoEncoder - BaseLine](/AutoEncoder%5BBaseline%5D.ipynb)
     ### Apparoach
-    AutoEncoder model consist of two parts, Encoder  and Decoder. Encoder downsamples the image to lower dimension dimension features, and decoder is used to reconstruct the same image using latent dimension. 
+    AutoEncoder model consist of two parts, Encoder  and Decoder. Encoder downsamples the image to lower dimension dimension features, and decoder is used to reconstruct the same image using latent dimension.
     
-    My Hypothesis is that If I am able to regenerate the same image with with little error, then we can say that latent dimension is compressed and dense feature that captures the image information in lower dimension. 
+    My Hypothesis is that If I am able to regenerate the same image with with little error, then we can say that latent dimension is compressed and dense feature that captures the image information in lower dimension.
     
     After training model, we will pass all images to encoder to generate the latent features, we will store latent features to database. At test time, we will pass image to encoder to get query features. we will then compute the euclidean distance to all the features in database to get top predction. 
     
-    ### Result:
-    
+    ### Result:  
     AutoEncoder produce the decent result, but it is still not good approach to generate the semantically similar image.
     
     it is also error prone and give some useless result, in AutoEncoder we rely on MSE loss which will focus on reducing each pixel error distance, which is misleading in semantic similarity.
@@ -91,11 +90,10 @@ And **cosine distance** would be **one minus the cosine of the angle from point 
 
     
     ### Solution Approach
-
-    * In this competition it is given that,if two or more images have **same label group** then they are **similar products.** 
-    * Basically we can use this information to transfer the business problem into **multi class classification** problem.
-    * From Image EDA, I found out that we have **11014** different classes, and dataset is **not balanced dataset**
-    * If you see below plot, we can clearly see that there are **hardly 1000 data points having more than 10 products per label.*
+    
+    * We were given information that all the **similar product have same label group.** 
+    * We can leverage this information to build **classification model to classify images into label group.**
+    * From Image EDA, I found out that we have **11014** different classes, and dataset is **not balanced dataset**, If you see below plot, we can clearly see that there are **hardly 1000 data points having more than 10 products per label.**
     * In this notebook I used **Weighted Sampler technique used in pytorch for handling imbalanced classification problem**
 
     ![Label_freq](/Shopee_Repo_Images/Label_frequency_plot.png)
