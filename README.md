@@ -33,11 +33,6 @@ sample_submission.csv - a sample submission file in the correct format.
 <!-- ![workflow](/Shopee%20Images/Model_Shopee.jpeg) -->
 ![workflow2](/Shopee%20Images/workflow_model.jpeg)
 
-
-## Overall Basic pipeline
-
-![CBIR](/Shopee%20Images/CBIR.jpeg) 
-
 ## High Level Solution Design 
 
 We divide the overall solution in the following 3 parts.
