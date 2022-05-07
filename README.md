@@ -6,15 +6,16 @@
 
 ## Business Problem
 
-Shopee is the leading e-commerce platform in Southeast Asia and Taiwan. Customers appreciate its easy, secure, and fast online shopping experience tailored to their region. The company also provides strong payment and logistical support along with a 'Lowest Price Guaranteed' feature on thousands of Shopee's listed products.
+- Finding near-duplicates in large datasets is an important problem for many online businesses. In Every E-commerce website, everyday users can upload their own images and write their own product descriptions, adding an extra layer of challenge. 
 
-Finding near-duplicates in large datasets is an important problem for many online businesses. In Shopee's case, everyday users can upload their own images and write their own product descriptions, adding an extra layer of challenge. Your task is to identify which products have been posted repeatedly. The differences between related products may be subtle while photos of identical products may be wildly different!
+- Task is to identify which products have been posted repeatedly. The differences between related products may be subtle while photos of identical products may be wildly different!
 
-Two different images of similar wares may represent the same product or two completely different items. Retailers want to avoid misrepresentations and other issues that could come from conflating two dissimilar products. Currently, a combination of deep learning and traditional machine learning analyzes image and text information to compare similarity. But major differences in images, titles, and product descriptions prevent these methods from being entirely effective.
+- Two different images of similar wares may represent the same product or two completely different items. Retailers want to avoid misrepresentations and other issues that could come from conflating two dissimilar products. 
 
-In this competition, we’ll apply our machine learning skills to build a model that predicts which items are the same products.
 
 ## Understanding the data
+We are using dataset provided by [Shopee Competition](https://www.kaggle.com/c/shopee-product-matching)
+
 [train/test].csv - the training set metadata. Each row contains the data for a single posting. Multiple postings might have the exact same image ID, but with different titles or vice versa.
     
 - posting_id - the ID code for the posting.
@@ -67,7 +68,7 @@ And **cosine distance** would be **one minus the cosine of the angle from point 
 
 ## List Of Approaches I tried In reversed Order of Performance Metric
 
-1. ArcFace Loss
+1. **ArcFace Loss F1 - Score : 0.72**
 
    ### Approach
 
@@ -75,7 +76,9 @@ And **cosine distance** would be **one minus the cosine of the angle from point 
    ArcFace adds more loss to the training procedure to encourage similar class embeddings to be close and dissimilar embeddings to be far from each other. This is adding a second task to the training of a CNN. The first task is predicting the image accurately.
    ![ArcFace](streamlit_out/Arcafceloss.jpeg)
    ### Loss Description
-   Besides the backbone that extracts features, there is the head for classification with a fully connected layer with trainable weights. The product of normalized weights and normalized features lie in the interval from -1 to 1. We can represent a logit for each class as the cosine of an angle between the feature and the ground truth weight inside a hypersphere with a unit radius. Also, there are two hyperparameters m (the additional angular margin) and s (scaling ratio from a small number to a final logit) that help adjust the distance between classes.
+   - Besides the backbone that extracts features, there is the head for classification with a fully connected layer with trainable weights.
+   - The product of normalized weights and normalized features lie in the interval from -1 to 1. We can represent a logit for each class as the cosine of an angle between the feature and the ground truth weight inside a hypersphere with a unit radius.
+   - Also, there are two hyperparameters m (the additional angular margin) and s (scaling ratio from a small number to a final logit) that help adjust the distance between classes.
    ### Results
    
    When I trained Product classification network with Arcface loss and generate embeddings using Arcface Backbone, F1 score improved from 0.62(Softmax Loss)  to 0.71, which is significant improvement, Arcface was handling class imbalance issue better than Softmax.
@@ -96,15 +99,15 @@ And **cosine distance** would be **one minus the cosine of the angle from point 
 
    ### ArcFace Model Recommendation Results
    
-2. [Product lassification using Weighted Random Sampler using multiclass Cross Entropy loss ](/PriceLabelClassification%5BTraining%5D.ipynb)
+2. [Product lassification using Weighted Random Sampler using multiclass Cross Entropy loss F1 Score 0.62](notebooks/ProductClassificationSoftmax[Training].ipynb)
 
     
    ### Solution Approach
     
-   We were given information that all the **similar product have same label group.** 
-   We can leverage this information to build **classification model to classify images into label group.**
-   From Image EDA, I found out that we have **11014** different classes, and dataset is **not balanced dataset**, If you see below plot, we can clearly see that there are **hardly 1000 data points having more than 10 products per label.**
-   In this notebook I used **Weighted Sampler technique used in pytorch for handling imbalanced classification problem**
+   - We were given information that all the **similar product have same label group.** 
+   - We can leverage this information to build **classification model to classify images into label group.**
+   - From Image EDA, I found out that we have **11014** different classes, and dataset is **not balanced dataset**, If you see below plot, we can clearly see that there are **hardly 1000 data points having more than 10 products per label.**
+   - In this notebook I used **Weighted Sampler technique used in pytorch for handling imbalanced classification problem**
 
   ![Label freq](streamlit_out/Label_frequency_plot.png)
   ### Results
@@ -112,7 +115,7 @@ And **cosine distance** would be **one minus the cosine of the angle from point 
   * Using **Weighted Sampler technique** really helped me to **improve classification accuracy** for **under represented label groups ( label groups for which only 2 product images** were available.
   * I achivied **0.62 F1 Score** which is significant improvement from earlier baseline model.
     
-3. Convolution AutoEncoder - BaseLine
+3. **[Convolution AutoEncoder - BaseLine F1 Score 0.51](notebooks/AutoEncoder[Baseline].ipynb)**
     ### Apparoach
     AutoEncoder model consist of two parts, Encoder  and Decoder. Encoder downsamples the image to lower dimension dimension features, and decoder is used to reconstruct the same image using latent dimension.
     
