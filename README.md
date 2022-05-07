@@ -144,3 +144,13 @@ And **cosine distance** would be **one minus the cosine of the angle from point 
 | GloVe                                          | 0.518    | Cosine                                 | 0.8                                         |
 | GloVe + IDF                                    | 0.536    | Cosine                                 | 0.8                                         |
 
+### Sample recommendation based on ArcFace Model
+
+![Recommendation1](out/rec1.png)
+![Recommendation1](out/rec2.png)
+
+![Recommendation1](out/rec3.png)
+
+![Recommendation1](out/rec4.png)
+![Recommendation1](out/rec5.png)
+
