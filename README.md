@@ -143,3 +143,4 @@ And **cosine distance** would be **one minus the cosine of the angle from point 
 | **Text TF-IDF**                                    | **0.648**    | Cosine                                 | 0.55                                        |
 | GloVe                                          | 0.518    | Cosine                                 | 0.8                                         |
 | GloVe + IDF                                    | 0.536    | Cosine                                 | 0.8                                         |
+
