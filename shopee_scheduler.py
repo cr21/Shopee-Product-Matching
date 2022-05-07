@@ -2,7 +2,7 @@ import torch
 
 from torch.optim.lr_scheduler import _LRScheduler
 import warnings
-
+# I used this code from Some Kaggle notebook, I am currently not able to recall it. 🙏 to anonymous source.
 print(torch.version)
 class ShopeeScheduler(_LRScheduler):
     def __init__(self, optimizer, lr_start=5e-6, lr_max=1e-5,
