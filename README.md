@@ -1,7 +1,7 @@
 
 # Shopee-Product-Matching
 
-![Shopee](/Shopee%20Images/Shopee_image1.jpeg)
+![Shopee](streamlit_out/Shopee_image1.jpeg)
 
 
 ## Business Problem
@@ -30,9 +30,8 @@ sample_submission.csv - a sample submission file in the correct format.
 - matches - Space delimited list of all posting IDs that match this posting. Posts always self-match. Group sizes were capped at 50, so there's no need to predict more than 50 matches.
 
 ## Workflow
-<!-- ![workflow](/Shopee%20Images/Model_Shopee.jpeg) -->
-![workflow2](/Shopee%20Images/workflow_model.jpeg)
 
+![Workflow2](streamlit_out/workflow_model.jpeg)
 ## High Level Solution Design 
 
 We divide the overall solution in the following 3 parts.
@@ -48,7 +47,8 @@ We were given information that **all the similar product have same label group**
 
 we train a classification CNN by inputting product images and getting a one hot vector output that represents the label group of the image. For example, pretend we train a CNN to classify ten types of product items and input an image. Then the one-hot-vector output pictured below predicts product label group 4.
 
-![cnn_embeddings](/Shopee%20Images/cnn_embeddings.jpeg)
+![cnn_embeddings](streamlit_out/cnnEmbeddings.jpeg)
+![vgg embeddings](streamlit_out/vgg_embeddings.jpeg)
 
 ### Generating Embeddings 
 
@@ -65,10 +65,54 @@ And **cosine distance** would be **one minus the cosine of the angle from point 
 
 
 
-## List Of Approaches I tried
+## List Of Approaches I tried In reversed Order of Performance Metric
 
+1. ArcFace Loss
 
-1. [Convolution AutoEncoder - BaseLine](/AutoEncoder%5BBaseline%5D.ipynb)
+   ### Approach
+
+   We would like similar classes ( Product belongs to same label_group) to have embeddings close to each other and dissimilar classes (Product belongs to different label_group) to be far from each other, But why would this happen? We didn't train our model to do this, we only trained our model to predict products accurately. 
+   ArcFace adds more loss to the training procedure to encourage similar class embeddings to be close and dissimilar embeddings to be far from each other. This is adding a second task to the training of a CNN. The first task is predicting the image accurately.
+   ![ArcFace](streamlit_out/Arcafceloss.jpeg)
+   ### Loss Description
+   Besides the backbone that extracts features, there is the head for classification with a fully connected layer with trainable weights. The product of normalized weights and normalized features lie in the interval from -1 to 1. We can represent a logit for each class as the cosine of an angle between the feature and the ground truth weight inside a hypersphere with a unit radius. Also, there are two hyperparameters m (the additional angular margin) and s (scaling ratio from a small number to a final logit) that help adjust the distance between classes.
+   ### Results
+   
+   When I trained Product classification network with Arcface loss and generate embeddings using Arcface Backbone, F1 score improved from 0.62(Softmax Loss)  to 0.71, which is significant improvement, Arcface was handling class imbalance issue better than Softmax.
+   
+   ### How to train ArcFace Loss
+   - Download dataset from  [Shopee Competition](https://www.kaggle.com/c/shopee-product-matching), and put it in `TRAIN_DIR` folder
+   - set configuration parameters  in `Config.py` (Parameters are self-explanatory) 
+   - Run `requirement.txt` to set up environment and files, or create new virtual environment and set up.
+   - Run `python train.py`
+   
+
+   ### How to do inference using Pytorch Model
+   - If you don't train model and want to use preprocessed embeddings, Download [pretrained_embeddings](https://www.kaggle.com/datasets/chiragtagadiya/training-embeddings-shopee) and put it in `TrainedEmbeddings` Directory
+   - Run `python inference.py`
+
+   ### How to start streamlit web app
+   - Run `streamlit run streamlit_app.py`
+
+   ### ArcFace Model Recommendation Results
+   
+2. [Product lassification using Weighted Random Sampler using multiclass Cross Entropy loss ](/PriceLabelClassification%5BTraining%5D.ipynb)
+
+    
+   ### Solution Approach
+    
+   We were given information that all the **similar product have same label group.** 
+   We can leverage this information to build **classification model to classify images into label group.**
+   From Image EDA, I found out that we have **11014** different classes, and dataset is **not balanced dataset**, If you see below plot, we can clearly see that there are **hardly 1000 data points having more than 10 products per label.**
+   In this notebook I used **Weighted Sampler technique used in pytorch for handling imbalanced classification problem**
+
+  ![Label freq](streamlit_out/Label_frequency_plot.png)
+  ### Results
+    
+  * Using **Weighted Sampler technique** really helped me to **improve classification accuracy** for **under represented label groups ( label groups for which only 2 product images** were available.
+  * I achivied **0.62 F1 Score** which is significant improvement from earlier baseline model.
+    
+3. Convolution AutoEncoder - BaseLine
     ### Apparoach
     AutoEncoder model consist of two parts, Encoder  and Decoder. Encoder downsamples the image to lower dimension dimension features, and decoder is used to reconstruct the same image using latent dimension.
     
@@ -77,25 +121,7 @@ And **cosine distance** would be **one minus the cosine of the angle from point 
     After training model, we will pass all images to encoder to generate the latent features, we will store latent features to database. At test time, we will pass image to encoder to get query features. we will then compute the euclidean distance to all the features in database to get top predction. 
     
     ### Result:  
-    AutoEncoder produce the decent result, but it is still not good approach to generate the semantically similar image.
+    F1 score for AutoEncoder model is 0.51 which is baseline for our case. AutoEncoder produce the decent result, but it is still not good approach to generate the semantically similar image.
     
     it is also error prone and give some useless result, in AutoEncoder we rely on MSE loss which will focus on reducing each pixel error distance, which is misleading in semantic similarity.
     
-2. [Label Group MultiClass classification using Weighted Random Sampler using multiclass Cross Entropy loss ](/PriceLabelClassification%5BTraining%5D.ipynb)
-
-    
-    ### Solution Approach
-    
-    * We were given information that all the **similar product have same label group.** 
-    * We can leverage this information to build **classification model to classify images into label group.**
-    * From Image EDA, I found out that we have **11014** different classes, and dataset is **not balanced dataset**, If you see below plot, we can clearly see that there are **hardly 1000 data points having more than 10 products per label.**
-    * In this notebook I used **Weighted Sampler technique used in pytorch for handling imbalanced classification problem**
-
-    ![Label_freq](/Shopee_Repo_Images/Label_frequency_plot.png)
-    
-    ### Results
-    
-    * Using **Weighted Sampler technique** really helped me to **improve classification accuracy** for **under represented label groups ( label groups for which only 2 product images** were available.
-    * I achivied **0.62 F1 Score** which is significant improvement from earlier baseline model.
-    
-

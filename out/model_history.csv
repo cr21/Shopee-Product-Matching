@@ -1,0 +1,2 @@
+,train_loss,validation_loss,train_f1_score,scheduler,valid_f1_score
+0,24.15484619140625,24.431550979614258,0.0,"{'lr_start': 0.0003, 'lr_max': 0.00012000000000000002, 'lr_min': 1e-06, 'lr_ramp_ep': 5, 'lr_sus_ep': 0, 'lr_decay': 0.8, 'base_lrs': [0.0003], 'last_epoch': 3, '_step_count': 2, 'verbose': False, '_get_lr_called_within_step': False, '_last_lr': [0.00022799999999999999]}",0.0
