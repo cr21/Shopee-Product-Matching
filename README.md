@@ -68,12 +68,13 @@ And **cosine distance** would be **one minus the cosine of the angle from point 
 
 ## List Of Approaches I tried In reversed Order of Performance Metric
 
-1. **ArcFace Loss F1 - Score : 0.72**
+1. **[ArcFace Loss F1 - Score : 0.72](notebooks/ArcfaceLoss[training].ipynb)**
 
    ### Approach
 
-   We would like similar classes ( Product belongs to same label_group) to have embeddings close to each other and dissimilar classes (Product belongs to different label_group) to be far from each other, But why would this happen? We didn't train our model to do this, we only trained our model to predict products accurately. 
-   ArcFace adds more loss to the training procedure to encourage similar class embeddings to be close and dissimilar embeddings to be far from each other. This is adding a second task to the training of a CNN. The first task is predicting the image accurately.
+   - We would like similar classes ( Product belongs to same label_group) to have embeddings close to each other and dissimilar classes (Product belongs to different label_group) to be far from each other, But why would this happen? We didn't train our model to do this, we only trained our model to predict products accurately. 
+   - ArcFace adds more loss to the training procedure to encourage similar class embeddings to be close and dissimilar embeddings to be far from each other. 
+   
    ![ArcFace](streamlit_out/Arcafceloss.jpeg)
    ### Loss Description
    - Besides the backbone that extracts features, there is the head for classification with a fully connected layer with trainable weights.
@@ -128,3 +129,17 @@ And **cosine distance** would be **one minus the cosine of the angle from point 
     
     it is also error prone and give some useless result, in AutoEncoder we rely on MSE loss which will focus on reducing each pixel error distance, which is misleading in semantic similarity.
     
+### Combined Results
+
+| Model                                          | F1 Score | K Nearest-Neighbors   Distance  Metric | Distance Threshold for K Nearest   Neighbor |
+|------------------------------------------------|----------|----------------------------------------|---------------------------------------------|
+| AutoEncoder                                    | 0.51     | Euclidean                              | No Thresholding, directly return top k      |
+| EffNet B3 SoftMax                              | 0.59     | Cosine                                 | 0.5                                         |
+| EffNet B3 SoftMax Weighted   Sampler           | 0.62     | Cosine                                 | 0.5                                         |
+| **EffNet B3 ArcFace**                              | **0.7**      | Cosine                                 | 0.3                                         |
+| **EffNet B3 ArcFace Weighted   Sampler**           | **0.72**     | Cosine                                 | 0.3                                         |
+| **EffNet B3 ArcFace Weighted   Sampler + TF-IDF**  | **0.74**     | Cosine                                 | For Image Model 0.3, For Text Model 0.17    |
+| **Text IDF**                                       | **0.661**    | Cosine                                 | 0.55                                        |
+| **Text TF-IDF**                                    | **0.648**    | Cosine                                 | 0.55                                        |
+| GloVe                                          | 0.518    | Cosine                                 | 0.8                                         |
+| GloVe + IDF                                    | 0.536    | Cosine                                 | 0.8                                         |

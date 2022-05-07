@@ -3,7 +3,7 @@ from config import CFG
 from arcface import ShopeeEncoderBackBone
 import torch
 import numpy as np
-
+from sklearn.metrics import f1_score
 import cv2
 from os import listdir
 from os.path import isfile, join
@@ -11,7 +11,7 @@ from tqdm import tqdm
 from sklearn.neighbors import NearestNeighbors
 import matplotlib.pyplot as plt
 from dataset import ShopeeQueryDataset
-
+import gc
 
 def getPretrainedModel(loss_module='ArcFace', model_path=CFG.model_path_arcface, device=CFG.device):
     """
@@ -77,6 +77,76 @@ def get_knn_model(embeddings, KNN=50, metric='cosine'):
     knnModel.fit(embeddings)
 
     return knnModel
+
+
+def finding_thresholds_for_nearest_neighbors(df, embeddings, KNN=50, isImage=False, metric_param='cosine'):
+    print(embeddings.shape)
+    model = NearestNeighbors(n_neighbors=KNN, metric=metric_param)
+    model.fit(embeddings)
+    distances, indices = model.kneighbors(embeddings)
+    print(distances.shape)
+    if not CFG.isTesting:
+
+        # we will use different threshold for neighbor retrieval, basically we also want to make threashold smaller
+        # to retrieval small number of records because we have testing image size around 70000 huge memory constraint
+        if isImage:
+            thresholds = list(np.arange(0.01, 4, 0.5))
+        else:
+            thresholds = list(np.arange(0.1, 1, 0.1))
+        scores = []
+        # for each threshold get top k neighbors with in threshold distance
+        # then get f1 score
+        for threshold in thresholds:
+            predictions = []
+            for k in range(embeddings.shape[0]):
+                idx = np.where(distances[k,] < threshold)[0]
+                ids = indices[k, idx]
+                # get posting ids based on retrival set
+                posting_ids = ' '.join(df['posting_id'].iloc[ids].values)
+                predictions.append(posting_ids)
+            df['pred_matches'] = predictions
+            df['f1'] = f1_score(df['matches'], df['pred_matches'])
+            score = df['f1'].mean()
+            print(f'Our f1 score for threshold {threshold} is {score}')
+            scores.append(score)
+        thresholds_scores = pd.DataFrame({'thresholds': thresholds, 'scores': scores})
+        max_score = thresholds_scores[thresholds_scores['scores'] == thresholds_scores['scores'].max()]
+        best_threshold = max_score['thresholds'].values[0]
+        best_score = max_score['scores'].values[0]
+        print(f'Our best score is {best_score} and has a threshold {best_threshold}')
+
+        # Use threshold
+        predictions = []
+        print("for training time")
+        for k in range(embeddings.shape[0]):
+            # Because we are predicting the test set that have 70K images and different label groups, confidence should be smaller
+            if isImage:
+                #                 print("choosing 0.2")
+                idx = np.where(distances[k,] < best_threshold)[0]
+            else:
+                idx = np.where(distances[k,] < best_threshold)[0]
+            ids = indices[k, idx]
+            posting_ids = df['posting_id'].iloc[ids].values
+            predictions.append(posting_ids)
+
+    # Because we are predicting the test set that have 70K images and different label groups, confidence should be smaller
+    else:
+        predictions = []
+        for k in tqdm(range(embeddings.shape[0])):
+            if isImage:
+                # testing for different threshold after submission
+                #                 idx = np.where(distances[k,] < 0.21 )[0]
+                idx = np.where(distances[k,] < 0.3)[0]
+            else:
+                #                 idx = np.where(distances[k,] < 0.30)[0]
+                idx = np.where(distances[k,] < 0.17)[0]
+            ids = indices[k, idx]
+            posting_ids = df['posting_id'].iloc[ids].values
+            predictions.append(posting_ids)
+
+    del model, distances, indices
+    gc.collect()
+    return df, predictions
 
 
 def get_neighbors(train_embeddings, query_embeddings, KNN=50, metric_param='cosine'):
