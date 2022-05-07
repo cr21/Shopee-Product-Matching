@@ -56,9 +56,10 @@ we train a classification CNN by inputting product images and getting a one hot 
 Now imagine that we want to compare two product images (of product that are not one of the  label groups, or with in the label groups) and decide whether they are similar. Images are hard to compare, but numbers are easy to compare. So we input an image into a CNN and take the activations of the last layer before output layer, which we called dense representation of image aka image embedding. In the picture above that is a vector of dimension 64. So we can input two images, get two embeddings, and then compare the embeddings. The CNN embeddings are meaningful because they represent patterns that are detected in the images.
 
 ### Cosine Distance
-We compare vectors (numbers) by computing the distance between them. What is the distance between the 3-dimensional vector [0.2, 0.9, 0.7] and [0.5, 0.4, 0.1]?
+We compare vectors (numbers) by computing the distance between them. What is the distance between the 3-dimensional vector
+`[0.2, 0.9, 0.7] and [0.5, 0.4, 0.1]`?
 
-There is no right answer because there are many ways to calculate distance. This problem further can be solved using metric learning approach, I will try to explore this in my future work. In high school we learn Euclidean distance, then the answer would be sqrt( (0.5-0.2)**2 + (0.4-0.9)**2 + (0.1-0.7)**2 ). If you imagine the vectors as points in 3-space, then Euclidean distance is literally the distance between them.
+There is no right answer because there are many ways to calculate distance. This problem further can be solved using metric learning approach, I will try to explore this in my future work. In high school we learn Euclidean distance, then the answer would be ` sqrt( (0.5-0.2)**2 + (0.4-0.9)**2 + (0.1-0.7)**2 )`. If you imagine the vectors as points in 3-space, then Euclidean distance is literally the distance between them.
 
 And **cosine distance** would be **one minus the cosine of the angle from point one to the origin to point two.** 
 **This equals 0 when the points are the same, and 1 when the points are far away.**
