@@ -132,6 +132,10 @@ where $s$ is a scaler that defines the radius of hypersphere where embeddings ar
 | GloVe                                          | 0.518    | Cosine                                 | 0.8                                         |
 | GloVe + IDF                                    | 0.536    | Cosine                                 | 0.8                                         |
 
+   ### Decision Boundry :
+   ![decision boundry](out/decision_boundry.png)
+   - We can consider Product are Matching If their cosine distance < 0.3 and Image Cosine distance < 0.3
+   - This range will give us more matching, but we need to remove some False Positive and False Negative Analysis
    
    ### How to train ArcFace Loss
    - Download dataset from  [Shopee Competition](https://www.kaggle.com/c/shopee-product-matching), and put it in `TRAIN_DIR` folder
