@@ -78,9 +78,19 @@ And **cosine distance** would be **one minus the cosine of the angle from point 
    
    ![ArcFace](streamlit_out/Arcafceloss.jpeg)
    ### Loss Description
-   - Besides the backbone that extracts features, there is the head for classification with a fully connected layer with trainable weights.
-   - The product of normalized weights and normalized features lie in the interval from -1 to 1. We can represent a logit for each class as the cosine of an angle between the feature and the ground truth weight inside a hypersphere with a unit radius.
-   - Also, there are two hyperparameters m (the additional angular margin) and s (scaling ratio from a small number to a final logit) that help adjust the distance between classes.
+   
+   1). Normalize the embeddings and weights vector
+   
+   2). Calculate the dot products b/w embeddings and weights
+   
+   3). Calculate the angles with arccos
+   
+   4). Add a constant factor angular margin m to the angle corresponding to the ground truth label
+and Turn angles back to cosines  
+   
+   5). Use cross entropy on the new cosine values to calculate loss
+   
+   
    ### Results
    
    When I trained Product classification network with Arcface loss and generate embeddings using Arcface Backbone, F1 score improved from 0.62(Softmax Loss)  to 0.71, which is significant improvement, Arcface was handling class imbalance issue better than Softmax.
@@ -135,12 +145,16 @@ And **cosine distance** would be **one minus the cosine of the angle from point 
 | Model                                          | F1 Score | K Nearest-Neighbors   Distance  Metric | Distance Threshold for K Nearest   Neighbor |
 |------------------------------------------------|----------|----------------------------------------|---------------------------------------------|
 | AutoEncoder                                    | 0.51     | Euclidean                              | No Thresholding, directly return top k      |
-| EffNet B3 SoftMax                              | 0.59     | Cosine                                 | 0.5                                         |
-| EffNet B3 SoftMax Weighted   Sampler           | 0.62     | Cosine                                 | 0.5                                         |
+| EffNet B3 SoftMax                              | 0.59     | Cosine                                | 0.5                                         |
+| EffNet B3 SoftMax Weighted   Sampler           | 0.62     | Cosine                           | 0.5                                         |
 | **EffNet B3 ArcFace**                              | **0.7**      | Cosine                                 | 0.3                                         |
 | **EffNet B3 ArcFace Weighted   Sampler**           | **0.72**     | Cosine                                 | 0.3                                         |
 | **EffNet B3 ArcFace Weighted   Sampler + TF-IDF**  | **0.74**     | Cosine                                 | For Image Model 0.3, For Text Model 0.17    |
 | **Text IDF**                                       | **0.661**    | Cosine                                 | 0.55                                        |
+| **Text TF-IDF**                                    | **0.648**    | Cosine                                 | 0.55                                        |
+| **Text MultiLingual BERT  Embeddings**                                    | **0.71**    | Cosine                                 | 0.16                                      |
+| **Text Indonesian DistilBERT  Embeddings**                                    | **0.69**    | Cosine                                 | 0.19                                    |
+| **Text Indonesian DistilBERT  Embeddings +  EffNet B3 ArcFace Weighted   Sampler**                                    | **0.76**    | Cosine                                 | For Image Model 0.3, For Text Model 0.17                                     |
 | **Text TF-IDF**                                    | **0.648**    | Cosine                                 | 0.55                                        |
 | GloVe                                          | 0.518    | Cosine                                 | 0.8                                         |
 | GloVe + IDF                                    | 0.536    | Cosine                                 | 0.8                                         |
