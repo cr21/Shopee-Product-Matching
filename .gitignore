@@ -2,5 +2,4 @@
 .idea
 MyEnv
 __pycache__
-
-
+venv
