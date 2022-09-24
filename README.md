@@ -69,7 +69,7 @@ And **cosine distance** would be **one minus the cosine of the angle from point 
 
 ## List Of Approaches I tried In reversed Order of Performance Metric
 
-1. **[ArcFace Loss F1 - Score : 0.72](notebooks/ArcfaceLoss[training].ipynb)**
+1. **[ArcFace Loss  F1 - Score : 0.72](notebooks/ArcfaceLoss[training].ipynb)**
 
    ### Approach
 
@@ -90,10 +90,48 @@ and Turn angles back to cosines
    
    5). Use cross entropy on the new cosine values to calculate loss
    
-   
+
+**Let's Understand this in details** 
+To understand the formula lets first recall cross-entropy loss and softmax definition.
+
+
+**Softmax cost** function is the average of the loss functions over the training set (or batch), 
+$$CE = -\frac{1}{N}\sum_{i=1}^{N}\log(\frac{e^{x_{i}}}{\sum_{j=1}^{n} e^{x_{j}}}).$$
+Based on the figure below,
+
+**softmax cost** can be written as
+$$CE = -\frac{1}{N}\sum_{i}^{N}\log(\frac{e^{W_{y_{i}}^{T}x_{i} + b_{y_{i}}}}{\sum_{j=1}^{n} e^{W_{j}^{T}x_{i} + b_{j}}}).$$
+where $x_{i}$ denotes embedding of the $i$-th sample, belonging to the $y_{i}$-th class (from the image above, $y_{i}=2$). $W_{j}$ denotes the $j$-th column of the weight matrix $W$.
+
+Lets fix $b=\mathbf{0}$, normalize all weight columns $\Vert W_{j}\Vert=1$ and normalize embedding vector $\Vert x\Vert=1$. After normalization, embedding will be distributed on a unit hypersphere. Now we have that 
+$$W_{j}^{T}x + b_{j}=\frac{W_{j}^{T}x}{\Vert W_{j}\Vert\Vert x\Vert} = \cos(\langle W_{j}^{T}, x\rangle)=\cos(\theta_{j}).$$
+
+Further, we can easily get $\theta$ angle applying $\arccos$ to both sides and after increase $\theta$ by penalty $m$. From the ArcFace paper https://arxiv.org/pdf/1801.07698.pdf, autors explained it as:  
+> We add an additive angular margin penalty $m$ between $x_{i}$ and $W_{y_{i}}$ to simultaneously enhance the intra-class compactness and inter-class discrepancy.
+
+After all, the softmax cost becomes 
+$$CE = -\frac{1}{N}\sum_{i}^{N}\log(\frac{e^{s \cos(\theta_{y_{i}}+m)}}{e^{s \cos(\theta_{y_{i}}+m)} + \sum_{j=1, j\neq y_{i}}^{n} e^{s \cos(\theta_{j})}})$$
+where $s$ is a scaler that defines the radius of hypersphere where embeddings are distributed. 
+
    ### Results
    
-   When I trained Product classification network with Arcface loss and generate embeddings using Arcface Backbone, F1 score improved from 0.62(Softmax Loss)  to 0.71, which is significant improvement, Arcface was handling class imbalance issue better than Softmax.
+  | Model                                          | F1 Score | K Nearest-Neighbors   Distance  Metric | Distance Threshold for K Nearest   Neighbor |
+|------------------------------------------------|----------|----------------------------------------|---------------------------------------------|
+| AutoEncoder                                    | 0.51     | Euclidean                              | No Thresholding, directly return top k      |
+| EffNet B3 SoftMax                              | 0.59     | Cosine                                | 0.5                                         |
+| EffNet B3 SoftMax Weighted   Sampler           | 0.62     | Cosine                           | 0.5                                         |
+| **EffNet B3 ArcFace**                              | **0.7**      | Cosine                                 | 0.3                                         |
+| **EffNet B3 ArcFace Weighted   Sampler**           | **0.72**     | Cosine                                 | 0.3                                         |
+| **EffNet B3 ArcFace Weighted   Sampler + TF-IDF**  | **0.74**     | Cosine                                 | For Image Model 0.3, For Text Model 0.17    |
+| **Text IDF**                                       | **0.661**    | Cosine                                 | 0.55                                        |
+| **Text TF-IDF**                                    | **0.648**    | Cosine                                 | 0.55                                        |
+| **Text MultiLingual BERT  Embeddings**                                    | **0.71**    | Cosine                                 | 0.16                                      |
+| **Text Indonesian DistilBERT  Embeddings**                                    | **0.69**    | Cosine                                 | 0.19                                    |
+| **Text Indonesian DistilBERT  Embeddings +  EffNet B3 ArcFace Weighted   Sampler**                                    | **0.76**    | Cosine                                 | For Image Model 0.3, For Text Model 0.17                                     |
+| **Text TF-IDF**                                    | **0.648**    | Cosine                                 | 0.55                                        |
+| GloVe                                          | 0.518    | Cosine                                 | 0.8                                         |
+| GloVe + IDF                                    | 0.536    | Cosine                                 | 0.8                                         |
+
    
    ### How to train ArcFace Loss
    - Download dataset from  [Shopee Competition](https://www.kaggle.com/c/shopee-product-matching), and put it in `TRAIN_DIR` folder
@@ -140,24 +178,6 @@ and Turn angles back to cosines
     
     it is also error prone and give some useless result, in AutoEncoder we rely on MSE loss which will focus on reducing each pixel error distance, which is misleading in semantic similarity.
     
-### Combined Results
-
-| Model                                          | F1 Score | K Nearest-Neighbors   Distance  Metric | Distance Threshold for K Nearest   Neighbor |
-|------------------------------------------------|----------|----------------------------------------|---------------------------------------------|
-| AutoEncoder                                    | 0.51     | Euclidean                              | No Thresholding, directly return top k      |
-| EffNet B3 SoftMax                              | 0.59     | Cosine                                | 0.5                                         |
-| EffNet B3 SoftMax Weighted   Sampler           | 0.62     | Cosine                           | 0.5                                         |
-| **EffNet B3 ArcFace**                              | **0.7**      | Cosine                                 | 0.3                                         |
-| **EffNet B3 ArcFace Weighted   Sampler**           | **0.72**     | Cosine                                 | 0.3                                         |
-| **EffNet B3 ArcFace Weighted   Sampler + TF-IDF**  | **0.74**     | Cosine                                 | For Image Model 0.3, For Text Model 0.17    |
-| **Text IDF**                                       | **0.661**    | Cosine                                 | 0.55                                        |
-| **Text TF-IDF**                                    | **0.648**    | Cosine                                 | 0.55                                        |
-| **Text MultiLingual BERT  Embeddings**                                    | **0.71**    | Cosine                                 | 0.16                                      |
-| **Text Indonesian DistilBERT  Embeddings**                                    | **0.69**    | Cosine                                 | 0.19                                    |
-| **Text Indonesian DistilBERT  Embeddings +  EffNet B3 ArcFace Weighted   Sampler**                                    | **0.76**    | Cosine                                 | For Image Model 0.3, For Text Model 0.17                                     |
-| **Text TF-IDF**                                    | **0.648**    | Cosine                                 | 0.55                                        |
-| GloVe                                          | 0.518    | Cosine                                 | 0.8                                         |
-| GloVe + IDF                                    | 0.536    | Cosine                                 | 0.8                                         |
 
 ### Sample recommendation based on ArcFace Model
 
